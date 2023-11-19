@@ -21,11 +21,15 @@ class App(QMainWindow):
         self.tab1 = MyTab(self)
         self.tab2 = MyTab(self)
         self.tab3 = MyTab(self)
+        self.tab4 = MyTab(self)
+        self.tab5 = MyTab(self)
 
         # Add tabs
         self.tabs.addTab(self.tab1, "Channel 1")
         self.tabs.addTab(self.tab2, "Channel 2")
         self.tabs.addTab(self.tab3, "Channel 3")
+        self.tabs.addTab(self.tab4, "Channel 4")
+        self.tabs.addTab(self.tab5, "Channel 5")
 
         self.tabsLayout.addWidget(self.tabs)
         self.centralWidget = QWidget()
