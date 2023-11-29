@@ -1,11 +1,10 @@
-import sys
-import datetime
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice
 from PyQt5 import uic
-from pyqtgraph import PlotWidget
-import pyqtgraph as pg
+import sys
+import datetime
+import openpyxl
 from channel import Channel
 
 # Creating the main window
@@ -58,10 +57,10 @@ class Main(QMainWindow):
         self.saveButton.clicked.connect(self.save)
         self.clearButton.clicked.connect(self.onClear)
         self.importButton.clicked.connect(self.onImport)
-        # self.calculateButon.clicked.connect(self.calculate)
         self.serial = QSerialPort()
         self.serial.setBaudRate(9600)
         self.isConnected = False
+        self.wasStopped = True
 
         self.ports_name_list = []
         self.ports_num_list = []
@@ -75,12 +74,31 @@ class Main(QMainWindow):
 
         self.ports.addItems(self.ports_name_list)
         self.serial.readyRead.connect(self.onRead)
+        self.graph_data = []
+        self.name_data_patient = ["Дата и время", "Доп. время(сек)", "ФИО", "№ Истории болезни",
+                                   "Диагноз", "Препараты", "Обстоятельства", "Фибриноген", "ПТИ", "МНО", "АЧТВ", "ACT", "Д-Димер",
+                                   "Тромбоциты"]
+        self.named_graph_data = ["Время до начала свёртывания, сек",
+                                 "Время до окончания свёртывания, сек",
+                                 "Длительность свёртывания, сек",
+                                 "Время до начала ретракции, сек",
+                                 "Время до окончания ретракции, сек",
+                                 "Длительность ретракции, сек",
+                                 "Максимальная амплитуда, ед",
+                                 "Минимальная амплитуда, ед",
+                                 "Амплитуда на 3 минуте фибринолиза, ед",
+                                 "Скорость свёртывания, ед/мин",
+                                 "Скорость нарастания фибринолиза, ед/мин",
+                                 "Коэффицент ректракции, %",
+                                 "Коэффицент фибринолиза, %",
+                                 "Активность фибринолиза, %"]
 
     def buttonConDis(self):
         if self.connectButton.text() == "Начать":
             self.connectButton.setText("Остановить")
             self.onConnect()
         elif self.connectButton.text() == "Остановить":
+            self.wasStopped = True
             self.connectButton.setText("Начать")
             self.onDisconnect()
 
@@ -101,7 +119,7 @@ class Main(QMainWindow):
     def onClear(self):
 
         for tab in self.tabsList:
-            tab.cnClear()
+            tab.chClear()
         self.onDisconnect()
         self.interferences = 0
         self.oldstrok_data = ''
@@ -147,7 +165,46 @@ class Main(QMainWindow):
             print("err", err)
 
     def save(self):
-        print("save")
+        data_patient = [self.dateTimeEdit.dateTime().toString('dd.MM.yyyy hh:mm'), self.addTimeEdit.value(),
+                        self.nameEdit.text(), self.numEdit.text(), self.diagnosisEdit.toPlainText(),
+                        self.conditionEdit.toPlainText(), self.medicationEdit.toPlainText(),
+                        self.fibrinogenEdit.value(), self.ptiEdit.value(), self.mnoEdit.value(), self.actvEdit.value(),
+                        self.actEdit.value(), self.ddimerEdit.value(), self.trombEdit.value()]
+
+        wb = openpyxl.Workbook()
+        wb.create_sheet(title='Лист', index=0)
+        counter = 1
+        for tab in self.tabsList:
+            sheet = wb['Лист']
+            for row in range(len(tab.chanelTime)):
+                cell = sheet.cell(row=row + 1, column=counter)
+                cell.value = tab.chanelTime[row]
+            counter += 1
+            for row in range(len(tab.chanelData)):
+                cell = sheet.cell(row=row + 1, column=counter)
+                cell.value = tab.chanelData[row]
+            counter += 1
+
+        all_name_data = self.name_data_patient + self.named_graph_data
+        for row in range(len(all_name_data)):
+            cell = sheet.cell(row=row + 1, column=11)
+            cell.value = all_name_data[row]
+
+        all_data = data_patient + self.graph_data
+        for row in range(len(all_data)):
+            cell = sheet.cell(row=row + 1, column=12)
+            cell.value = all_data[row]
+        try:
+            filename = QFileDialog.getSaveFileName(self, "Сохранить в таблицу",
+                                                   str(self.nameEdit.text().split()[0]) + '_' +
+                                                   self.dateTimeEdit.dateTime().toString('dd-MM-yyyy_hh-mm'), "*.xlsx")
+        except:
+            filename = QFileDialog.getSaveFileName(self, "Сохранить в таблицу", '', "*.xlsx")
+        print(filename)
+        try:
+            wb.save(filename[0])
+        except:
+            print('Save error')
 
     def onImport(self):
         print("import")

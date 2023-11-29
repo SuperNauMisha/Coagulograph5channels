@@ -28,7 +28,7 @@ class Channel(QWidget):
     def chCalculate(self):
         print("calculate")
 
-    def cnClear(self):
+    def chClear(self):
         pass
 
     def writeData(self, data):
