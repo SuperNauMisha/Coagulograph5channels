@@ -117,7 +117,6 @@ class Main(QMainWindow):
 
 
     def onClear(self):
-
         for tab in self.tabsList:
             tab.chClear()
         self.onDisconnect()
@@ -132,10 +131,8 @@ class Main(QMainWindow):
         self.numEdit.setText('')
         self.diagnosisEdit.clear()
         self.conditionEdit.clear()
-        # self.output.clear()
         self.dt_now = datetime.datetime.today()
         self.dateTimeEdit.setDateTime(self.dt_now)
-        # self.graph.clear()
         self.fibrinogenEdit.setValue(0)
         self.ptiEdit.setValue(0)
         self.mnoEdit.setValue(0)
@@ -144,8 +141,6 @@ class Main(QMainWindow):
         self.addTimeEdit.setValue(0)
         self.ddimerEdit.setValue(0)
         self.trombEdit.setValue(0)
-        # self.beforeClottingSlider.setValue(0)
-        # self.afterClottingSlider.setValue(0)
         self.medicationEdit.clear()
 
     def onRead(self):
@@ -200,14 +195,65 @@ class Main(QMainWindow):
                                                    self.dateTimeEdit.dateTime().toString('dd-MM-yyyy_hh-mm'), "*.xlsx")
         except:
             filename = QFileDialog.getSaveFileName(self, "Сохранить в таблицу", '', "*.xlsx")
-        print(filename)
         try:
             wb.save(filename[0])
         except:
             print('Save error')
 
     def onImport(self):
-        print("import")
+        self.onClear()
+        filename = QFileDialog.getOpenFileName(self, "Импортировать из таблицы", '', "*.xlsx")
+        wb = openpyxl.load_workbook(filename[0])
+        sh_names = wb.sheetnames
+        sheet = wb[sh_names[0]]
+        column = 1
+        try:
+            for tab in self.tabsList:
+                row = 1
+                while True:
+                    row += 1
+                    cell = sheet.cell(row=row, column=column)
+                    val = cell.value
+                    if val == None:
+                        break
+                    else:
+                        print(val)
+                        tab.chanelTime.append(val)
+                        cell = sheet.cell(row=row, column=column+1)
+                        val = cell.value
+                        print(val)
+                        tab.chanelData.append(val)
+                column += 2
+                tab.chImport()
+        except Exception as err:
+            print(err)
+        # norm_data_list = [int(item / self.maxTopValue * 100) for item in self.data_list]
+        # self.graph.plot(self.time, norm_data_list, pen=self.pen)
+        # self.graph.disableAutoRange()
+        # self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=self.maxRightValue)
+        try:
+            data_patient = []
+            for row in range(len(self.name_data_patient)):
+                cell = sheet.cell(row=row + 1, column=12)
+                val = cell.value
+                data_patient.append(val)
+            datetime_str1 = data_patient[0]
+            self.dateTimeEdit.setDateTime(datetime.datetime.strptime(datetime_str1, '%d.%m.%Y %H:%M'))
+            self.addTimeEdit.setValue(data_patient[1])
+            self.nameEdit.setText(data_patient[2])
+            self.numEdit.setText(data_patient[3])
+            self.diagnosisEdit.setPlainText(data_patient[4])
+            self.conditionEdit.setPlainText(data_patient[5])
+            self.medicationEdit.setPlainText(data_patient[6])
+            self.fibrinogenEdit.setValue(data_patient[7])
+            self.ptiEdit.setValue(data_patient[8])
+            self.mnoEdit.setValue(data_patient[9])
+            self.actvEdit.setValue(data_patient[10])
+            self.actEdit.setValue(data_patient[11])
+            self.ddimerEdit.setValue(data_patient[12])
+            self.trombEdit.setValue(data_patient[13])
+        except Exception as err:
+            print(err)
 
     def calculate(self):
         self.tab1.chCalculate()

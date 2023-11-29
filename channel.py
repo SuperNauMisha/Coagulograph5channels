@@ -12,7 +12,6 @@ class Channel(QWidget):
         uic.loadUi('channel.ui', self)
         self.maxTopValue = parent.maxTopValue
         self.setLayout(self.tabsMain)
-        self.graph_data = []
         self.graph.addLegend()
         self.graph.disableAutoRange()
         self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=parent.maxRightValue)
@@ -29,7 +28,18 @@ class Channel(QWidget):
         print("calculate")
 
     def chClear(self):
-        pass
+        self.chanelData = []
+        self.chanelTime = []
+        self.norm_data_list = []
+        self.now_time = 0
+        self.interferences = 0
+        self.output.clear()
+        self.graph.clear()
+        self.beforeClottingSlider.setValue(0)
+        self.afterClottingSlider.setValue(0)
+
+    def chImport(self):
+        self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
 
     def writeData(self, data):
         self.chanelData.append(data)
@@ -40,4 +50,3 @@ class Channel(QWidget):
         else:
             self.interferences = 0
             self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
-            print(self.chanelData)
