@@ -60,7 +60,7 @@
         <number>10</number>
        </property>
        <item>
-        <widget class="QPushButton" name="clear_button">
+        <widget class="QPushButton" name="clearButton">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -91,7 +91,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="ports_box">
+        <widget class="QComboBox" name="ports">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -100,7 +100,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="connect_button">
+        <widget class="QPushButton" name="connectButton">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -112,7 +112,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="import_button">
+        <widget class="QPushButton" name="importButton">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -124,7 +124,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="save_button">
+        <widget class="QPushButton" name="saveButton">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -313,7 +313,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="name">
+              <widget class="QLineEdit" name="nameEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -394,7 +394,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="num">
+              <widget class="QLineEdit" name="numEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -442,7 +442,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="diagnosis">
+            <widget class="QPlainTextEdit" name="diagnosisEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -497,7 +497,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="condition">
+            <widget class="QPlainTextEdit" name="conditionEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -552,7 +552,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="medication">
+            <widget class="QPlainTextEdit" name="medicationEdit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -595,7 +595,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="fibrinogen">
+            <widget class="QDoubleSpinBox" name="fibrinogenEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -620,7 +620,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="pti">
+            <widget class="QSpinBox" name="ptiEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -645,7 +645,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="mno">
+            <widget class="QDoubleSpinBox" name="mnoEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -670,7 +670,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="actv">
+            <widget class="QSpinBox" name="actvEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -698,7 +698,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="act">
+            <widget class="QSpinBox" name="actEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -726,7 +726,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="ddimer">
+            <widget class="QSpinBox" name="ddimerEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>
@@ -754,7 +754,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="tromb">
+            <widget class="QSpinBox" name="trombEdit">
              <property name="font">
               <font>
                <pointsize>11</pointsize>

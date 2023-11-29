@@ -2,35 +2,42 @@ import sys
 import datetime
 import numpy as np
 from PyQt5 import uic
+import pyqtgraph as pg
 from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QTabWidget, QLabel
 
 
 class Channel(QWidget):
-    def __int__(self, parent):
+    def __init__(self, parent):
         super(QWidget, self).__init__(parent)
         uic.loadUi('channel.ui', self)
-        super(QWidget, self).__init__(parent)
-        self.layout = QVBoxLayout(self)
+        self.maxTopValue = parent.maxTopValue
+        self.setLayout(self.tabsMain)
+        self.graph_data = []
+        self.graph.addLegend()
+        self.graph.disableAutoRange()
+        self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=parent.maxRightValue)
+        self.graph.setBackground('w')
+        self.pen = pg.mkPen(color=(255, 0, 0))
+        self.calculateButon.clicked.connect(parent.calculate)
+        self.chanelData = []
+        self.chanelTime = []
+        self.norm_data_list = []
+        self.now_time = 0
+        self.interferences = 0
 
-        # Initialize tab screen
-        self.tabs = QTabWidget()
-        self.tab1 = QWidget()
-        self.tab2 = QWidget()
-        self.tab3 = QWidget()
-        self.tabs.resize(300, 200)
+    def chCalculate(self):
+        print("calculate")
 
-        # Add tabs
-        self.tabs.addTab(self.tab1, "Geeks")
-        self.tabs.addTab(self.tab2, "For")
-        self.tabs.addTab(self.tab3, "Geeks")
+    def cnClear(self):
+        pass
 
-        # Create first tab
-        self.tab1.layout = QVBoxLayout(self)
-        self.l = QLabel()
-        self.l.setText("This is the first tab")
-        self.tab1.layout.addWidget(self.l)
-        self.tab1.setLayout(self.tab1.layout)
-
-        # Add tabs to widget
-        self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
+    def writeData(self, data):
+        self.chanelData.append(data)
+        self.chanelTime.append(self.now_time)
+        self.now_time += 1
+        if self.interferences < 10:
+            self.interferences += 1
+        else:
+            self.interferences = 0
+            self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
+            print(self.chanelData)
