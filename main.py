@@ -18,32 +18,11 @@ class Main(QMainWindow):
         self.width = 700
         self.height = 500
         self.setWindowTitle(self.title)
-        self.maxTopValue = 600
+        self.maxTopValue = 220
         self.maxRightValue = 2000
         self.chChars = ['@', '#', '$', '%', '^']
 
         # Initialize tab screen
-        self.tabs = QTabWidget()
-        self.tab1 = Channel(self)
-        self.tab2 = Channel(self)
-        self.tab3 = Channel(self)
-        self.tab4 = Channel(self)
-        self.tab5 = Channel(self)
-        self.tabsList = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
-
-        # Add tabs
-        self.tabs.addTab(self.tab1, "Channel 1")
-        self.tabs.addTab(self.tab2, "Channel 2")
-        self.tabs.addTab(self.tab3, "Channel 3")
-        self.tabs.addTab(self.tab4, "Channel 4")
-        self.tabs.addTab(self.tab5, "Channel 5")
-
-        self.tabsLayout.addWidget(self.tabs)
-        self.centralWidget = QWidget()
-        self.centralWidget.setLayout(self.mainLayout)
-
-        self.setCentralWidget(self.centralWidget)
-        self.show()
 
         self.strok_data = ''
         self.oldstrok_data = ''
@@ -93,6 +72,28 @@ class Main(QMainWindow):
                                  "Коэффицент фибринолиза, %",
                                  "Активность фибринолиза, %"]
 
+        self.tabs = QTabWidget()
+        self.tab1 = Channel(self)
+        self.tab2 = Channel(self)
+        self.tab3 = Channel(self)
+        self.tab4 = Channel(self)
+        self.tab5 = Channel(self)
+        self.tabsList = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
+
+        # Add tabs
+        self.tabs.addTab(self.tab1, "Channel 1")
+        self.tabs.addTab(self.tab2, "Channel 2")
+        self.tabs.addTab(self.tab3, "Channel 3")
+        self.tabs.addTab(self.tab4, "Channel 4")
+        self.tabs.addTab(self.tab5, "Channel 5")
+
+        self.tabsLayout.addWidget(self.tabs)
+        self.centralWidget = QWidget()
+        self.centralWidget.setLayout(self.mainLayout)
+
+        self.setCentralWidget(self.centralWidget)
+        self.show()
+
     def buttonConDis(self):
         if self.connectButton.text() == "Начать":
             self.connectButton.setText("Остановить")
@@ -104,12 +105,15 @@ class Main(QMainWindow):
 
     def onConnect(self):
         print("connect")
-        choose_index = self.ports_name_list.index(self.ports.currentText())
-        choose_com_port = self.ports_num_list[choose_index]
-        print(choose_com_port)
-        self.serial.setPortName(choose_com_port)
-        self.serial.open(QIODevice.ReadOnly)
-        self.serial.readyRead.connect(self.onRead)
+        try:
+            choose_index = self.ports_name_list.index(self.ports.currentText())
+            choose_com_port = self.ports_num_list[choose_index]
+            print(choose_com_port)
+            self.serial.setPortName(choose_com_port)
+            self.serial.open(QIODevice.ReadOnly)
+            self.serial.readyRead.connect(self.onRead)
+        except Exception as err:
+            print(err)
 
     def onDisconnect(self):
         print("disconnect")
@@ -203,8 +207,10 @@ class Main(QMainWindow):
     def onImport(self):
         self.onClear()
         filename = QFileDialog.getOpenFileName(self, "Импортировать из таблицы", '', "*.xlsx")
+
         wb = openpyxl.load_workbook(filename[0])
         sh_names = wb.sheetnames
+        print(sh_names, filename)
         sheet = wb[sh_names[0]]
         column = 1
         try:
@@ -217,10 +223,9 @@ class Main(QMainWindow):
                     if val == None:
                         break
                     else:
-                        print(val)
                         tab.chanelTime.append(val)
                         cell = sheet.cell(row=row, column=column+1)
-                        val = cell.value
+                        val = cell.value #/ self.maxTopValue * 100
                         print(val)
                         tab.chanelData.append(val)
                 column += 2
@@ -256,11 +261,11 @@ class Main(QMainWindow):
             print(err)
 
     def calculate(self):
-        self.tab1.chCalculate()
-        self.tab2.chCalculate()
-        self.tab3.chCalculate()
-        self.tab4.chCalculate()
-        self.tab5.chCalculate()
+        self.tab1.chCalculate(self)
+        self.tab2.chCalculate(self)
+        self.tab3.chCalculate(self)
+        self.tab4.chCalculate(self)
+        self.tab5.chCalculate(self)
 
 
 
@@ -269,4 +274,5 @@ class Main(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = Main()
+    ex.serial.close()
     sys.exit(app.exec_())
