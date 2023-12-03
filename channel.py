@@ -70,6 +70,7 @@ class Channel(QWidget):
             # (data[0, :] - координата времени, сек; data[1, :] - значение прибора(?), соответсвующий данному моменту времени).
             datanorm = self.contour(data, period) #перестраиваем на верхние и нижние пики. datanorm - четырёхмерный массив (NumPy):
             #(datanorm[0, :] - время верхних пиков, сек; datanorm[1, :] - значение верхних пиков; datanorm[2, :] - время нижних пиков, сек; datanorm[3, :] - значение нижних пиков).
+            datanorm = datanorm[ :,:-1]
             zeroboard = self.zeropoint(datanorm, np.min(data[1, :])) #граница ухода с начального плато (плато нулей) (одномерный массив (NumPy): [0] - координата границы, сек; [1] - индекс этой точки в datanorm).
             if self.beforeClottingSlider.value():
                 zeroboard[0] = self.beforeClottingSlider.value()
@@ -198,12 +199,13 @@ class Channel(QWidget):
     def platopoint(self, datanorm, zeroindex, deltamin, sigma):
         plato = np.array([[deltamin[1],deltamin[0]], [deltamin[1], deltamin[0]], [0,0]])
         stopper = 0
+        omega = 1
         rightindex = int(deltamin[2])
         for i in range (int(deltamin[2]), int(zeroindex), -1):
             deltanext = datanorm[1, i] - datanorm[3, i]
             delta = datanorm[1, i-1] - datanorm[3, i-1]
             deltalast = datanorm[1, i-2] - datanorm[3, i-2]
-            if (delta <= deltamin[0]*(1+sigma)) and (deltanext <= deltamin[0]*(1+sigma)) and (deltalast <= deltamin[0]*(1+sigma)):
+            if (delta <= deltamin[0]*(1+sigma)+omega) and (deltanext <= deltamin[0]*(1+sigma)+omega) and (deltalast <= deltamin[0]*(1+sigma)+omega):
                 plato[0,0] = (datanorm[0,i-2]+datanorm[2, i-2])/2# + self.addTime
                 plato[0,1] = deltalast
 
@@ -211,7 +213,7 @@ class Channel(QWidget):
             deltanext = datanorm[1, i] - datanorm[3, i]
             delta = datanorm[1, i-1] - datanorm[3, i-1]
             deltalast = datanorm[1, i-2] - datanorm[3, i-2]
-            if (delta <= deltamin[0]*(1+sigma)) and (deltanext <= deltamin[0]*(1+sigma)) and (deltalast <= deltamin[0]*(1+sigma)):
+            if (delta <= deltamin[0]*(1+sigma)+omega) and (deltanext <= deltamin[0]*(1+sigma)+omega) and (deltalast <= deltamin[0]*(1+sigma)+omega):
                 plato[1,0] = (datanorm[0,i]+datanorm[2, i])/2
                 plato[1,1] = deltanext
                 rightindex = i
