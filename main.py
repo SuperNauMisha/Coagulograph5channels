@@ -18,7 +18,7 @@ class Main(QMainWindow):
         self.width = 700
         self.height = 500
         self.setWindowTitle(self.title)
-        self.maxTopValue = 220
+        self.maxTopValue = 800
         self.maxRightValue = 2000
         self.chChars = ['@', '#', '$', '%', '^']
 
@@ -46,10 +46,8 @@ class Main(QMainWindow):
         ports = QSerialPortInfo().availablePorts()
         for port in ports:
             full_name = port.portName() + " " + port.description()
-            print(full_name)
             self.ports_name_list.append(full_name)
             self.ports_num_list.append(port.portName())
-            print(full_name)
 
         self.ports.addItems(self.ports_name_list)
         self.serial.readyRead.connect(self.onRead)
@@ -108,7 +106,6 @@ class Main(QMainWindow):
         try:
             choose_index = self.ports_name_list.index(self.ports.currentText())
             choose_com_port = self.ports_num_list[choose_index]
-            print(choose_com_port)
             self.serial.setPortName(choose_com_port)
             self.serial.open(QIODevice.ReadOnly)
             self.serial.readyRead.connect(self.onRead)
@@ -159,7 +156,7 @@ class Main(QMainWindow):
                 chChar = self.oldstrok_data[0]
                 self.oldstrok_data = ''
                 if chChar in self.chChars:
-                    self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100))
+                    self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
         except Exception as err:
             print("err", err)
 
@@ -210,7 +207,7 @@ class Main(QMainWindow):
 
         wb = openpyxl.load_workbook(filename[0])
         sh_names = wb.sheetnames
-        print(sh_names, filename)
+        # print(sh_names, filename)
         sheet = wb[sh_names[0]]
         column = 1
         try:
@@ -226,7 +223,7 @@ class Main(QMainWindow):
                         tab.chanelTime.append(val)
                         cell = sheet.cell(row=row, column=column+1)
                         val = cell.value #/ self.maxTopValue * 100
-                        print(val)
+                        # print(val)
                         tab.chanelData.append(val)
                 column += 2
                 tab.chImport()

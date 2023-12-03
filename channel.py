@@ -19,6 +19,7 @@ class Channel(QWidget):
         self.graph.addLegend()
         self.graph.disableAutoRange()
         self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=parent.maxRightValue)
+        self.maxRightValue = parent.maxRightValue
         self.graph.setBackground('w')
         self.pen = pg.mkPen(color=(255, 0, 0))
         self.calculateButon.clicked.connect(parent.calculate)
@@ -42,6 +43,11 @@ class Channel(QWidget):
         self.afterClottingSlider.setValue(0)
 
     def chImport(self):
+        if max(self.chanelTime) > self.maxRightValue:
+            self.maxRightValue = max(self.chanelTime) + 10
+            self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=self.maxRightValue)
+            self.beforeClottingSlider.setMaximum(self.maxRightValue)
+            self.afterClottingSlider.setMaximum(self.maxRightValue)
         self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
 
     def writeData(self, data):
@@ -65,7 +71,8 @@ class Channel(QWidget):
             datanorm = self.contour(data, period) #перестраиваем на верхние и нижние пики. datanorm - четырёхмерный массив (NumPy):
             #(datanorm[0, :] - время верхних пиков, сек; datanorm[1, :] - значение верхних пиков; datanorm[2, :] - время нижних пиков, сек; datanorm[3, :] - значение нижних пиков).
             zeroboard = self.zeropoint(datanorm, np.min(data[1, :])) #граница ухода с начального плато (плато нулей) (одномерный массив (NumPy): [0] - координата границы, сек; [1] - индекс этой точки в datanorm).
-            zeroboard[0] = self.beforeClottingSlider.value()
+            if self.beforeClottingSlider.value():
+                zeroboard[0] = self.beforeClottingSlider.value()
 
             for i in range(len(datanorm[0, :])):
                 if datanorm[0, i] >= zeroboard[0]:
@@ -73,8 +80,9 @@ class Channel(QWidget):
                     break
 
             deltamin = self.mindeltapoint(datanorm, zeroboard[1]) # точка с минимальной шириной графика (одномерный массив (NumPy): [0] - ширина; [1] - координата, сек; [2] - индекс точки в datanorm).
-            print(deltamin)
-            deltamin[1] = self.afterClottingSlider.value()
+            # print(deltamin)
+            if self.afterClottingSlider.value():
+                deltamin[1] = self.afterClottingSlider.value()
 
             for i in range(len(datanorm[0, :])):
                 if datanorm[0, i] >= deltamin[1]:
