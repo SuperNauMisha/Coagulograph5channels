@@ -18,9 +18,9 @@ class Main(QMainWindow):
         self.width = 700
         self.height = 500
         self.setWindowTitle(self.title)
-        self.maxTopValue = 800
+        self.maxTopValue = 1200
         self.maxRightValue = 2000
-        self.chChars = ['@', '#', '$', '%', '^']
+        self.chChars = ['^', '%', '$', '#', '@']
 
         # Initialize tab screen
 
@@ -101,20 +101,22 @@ class Main(QMainWindow):
             self.connectButton.setText("Начать")
             self.onDisconnect()
 
+
     def onConnect(self):
         print("connect")
         try:
             choose_index = self.ports_name_list.index(self.ports.currentText())
             choose_com_port = self.ports_num_list[choose_index]
             self.serial.setPortName(choose_com_port)
-            self.serial.open(QIODevice.ReadOnly)
+            self.serial.open(QIODevice.ReadWrite)
             self.serial.readyRead.connect(self.onRead)
+            self.sendData('r')
         except Exception as err:
             print(err)
 
     def onDisconnect(self):
-        print("disconnect")
-        self.serial.close()
+        self.sendData('p')
+        #self.serial.close()
 
 
     def onClear(self):
@@ -146,20 +148,26 @@ class Main(QMainWindow):
 
     def onRead(self):
         try:
-            data = self.serial.readLine()
-            self.strok_data = str(data)[2:-1]
-            if r"\n" not in self.strok_data:
-                self.oldstrok_data += self.strok_data
-            else:
-                self.oldstrok_data += self.strok_data
-                num = self.oldstrok_data[1:-4]
-                chChar = self.oldstrok_data[0]
-                self.oldstrok_data = ''
-                if chChar in self.chChars:
-                    self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
+            while self.serial.bytesAvailable() > 0:
+                data = self.serial.readLine()
+                self.strok_data = str(data)[2:-1]
+                if r"\n" in self.strok_data:
+                    self.oldstrok_data += self.strok_data
+                    num = self.oldstrok_data[1:-4]
+
+                    chChar = self.oldstrok_data[0]
+                    print(num, chChar)
+                    self.oldstrok_data = ''
+                    if chChar in self.chChars:
+                        self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
         except Exception as err:
             print("err", err)
 
+    def sendData(self, data_to_send):
+            if self.serial.isOpen():
+                data_to_send += "*"
+                self.serial.write(data_to_send.encode())
+                print(data_to_send)
     def save(self):
         data_patient = [self.dateTimeEdit.dateTime().toString('dd.MM.yyyy hh:mm'), self.addTimeEdit.value(),
                         self.nameEdit.text(), self.numEdit.text(), self.diagnosisEdit.toPlainText(),
@@ -256,16 +264,12 @@ class Main(QMainWindow):
             self.trombEdit.setValue(data_patient[13])
         except Exception as err:
             print(err)
-
     def calculate(self):
         self.tab1.chCalculate(self)
         self.tab2.chCalculate(self)
         self.tab3.chCalculate(self)
         self.tab4.chCalculate(self)
         self.tab5.chCalculate(self)
-
-
-
 
 
 if __name__ == '__main__':
