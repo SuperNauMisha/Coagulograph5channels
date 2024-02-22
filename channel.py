@@ -51,11 +51,10 @@ class Channel(QWidget):
         self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
 
     def writeData(self, data):
-        print(data)
         self.chanelData.append(data)
         self.chanelTime.append(self.now_time)
-        self.now_time += 5
-        if self.interferences < 2:
+        self.now_time += 0.5
+        if self.interferences < 15:
             self.interferences += 1
         else:
             self.interferences = 0

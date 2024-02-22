@@ -20,7 +20,7 @@ class Main(QMainWindow):
         self.setWindowTitle(self.title)
         self.maxTopValue = 1200
         self.maxRightValue = 2000
-        self.chChars = ['^', '%', '$', '#', '@']
+        self.chChars = ['@', '#', '$', '%', '^']
 
         # Initialize tab screen
 
@@ -154,9 +154,7 @@ class Main(QMainWindow):
                 if r"\n" in self.strok_data:
                     self.oldstrok_data += self.strok_data
                     num = self.oldstrok_data[1:-4]
-
                     chChar = self.oldstrok_data[0]
-                    print(num, chChar)
                     self.oldstrok_data = ''
                     if chChar in self.chChars:
                         self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
@@ -167,7 +165,6 @@ class Main(QMainWindow):
             if self.serial.isOpen():
                 data_to_send += "*"
                 self.serial.write(data_to_send.encode())
-                print(data_to_send)
     def save(self):
         data_patient = [self.dateTimeEdit.dateTime().toString('dd.MM.yyyy hh:mm'), self.addTimeEdit.value(),
                         self.nameEdit.text(), self.numEdit.text(), self.diagnosisEdit.toPlainText(),
