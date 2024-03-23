@@ -6,6 +6,7 @@ import sys
 import datetime
 import openpyxl
 from channel import Channel
+from general_view import GeneralWiev
 
 # Creating the main window
 class Main(QMainWindow):
@@ -76,6 +77,7 @@ class Main(QMainWindow):
         self.tab3 = Channel(self)
         self.tab4 = Channel(self)
         self.tab5 = Channel(self)
+        self.tab6 = GeneralWiev(self)
         self.tabsList = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
 
         # Add tabs
@@ -84,6 +86,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab3, "Channel 3")
         self.tabs.addTab(self.tab4, "Channel 4")
         self.tabs.addTab(self.tab5, "Channel 5")
+        self.tabs.addTab(self.tab6, "General view")
 
         self.tabsLayout.addWidget(self.tabs)
         self.centralWidget = QWidget()
