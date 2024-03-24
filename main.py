@@ -6,7 +6,7 @@ import sys
 import datetime
 import openpyxl
 from channel import Channel
-from general_view import GeneralWiev
+from general_view import GeneralView
 
 # Creating the main window
 class Main(QMainWindow):
@@ -77,7 +77,7 @@ class Main(QMainWindow):
         self.tab3 = Channel(self)
         self.tab4 = Channel(self)
         self.tab5 = Channel(self)
-        self.tab6 = GeneralWiev(self)
+        self.tab6 = GeneralView(self)
         self.tabsList = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
 
         # Add tabs
@@ -125,6 +125,7 @@ class Main(QMainWindow):
     def onClear(self):
         for tab in self.tabsList:
             tab.chClear()
+        self.tab6.clear()
         self.onDisconnect()
         self.interferences = 0
         self.oldstrok_data = ''
@@ -161,6 +162,7 @@ class Main(QMainWindow):
                     self.oldstrok_data = ''
                     if chChar in self.chChars:
                         self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
+                        self.tab6.update_data(self.chChars.index(chChar), round(int(num) / self.maxTopValue * 100, 2))
         except Exception as err:
             print("err", err)
 
