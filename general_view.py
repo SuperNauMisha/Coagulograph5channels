@@ -10,7 +10,7 @@ class GeneralView(QWidget):
         super(QWidget, self).__init__(parent)
         uic.loadUi('general_view.ui', self)
         self.maxTopValue = parent.maxTopValue
-        self.time = []
+        self.time = [0.0]
         self.setLayout(self.girdMain)
         self.data_all_ch = [[], [], [], [], []]
         self.now_time = 0
@@ -25,15 +25,17 @@ class GeneralView(QWidget):
         self.pen = pg.mkPen(color=(255, 0, 0))
 
     def update_data(self, ind, num):
-        self.data_all_ch[ind].append(num)
-        self.time.append(self.now_time)
-        self.now_time += 0.5
-        if self.interferences < 15:
-            self.interferences += 1
-        else:
-            self.interferences = 0
-            for graph_ind in range(len(self.graps)):
-                self.graps[graph_ind].plot(self.time, self.data_all_ch[graph_ind], pen=self.pen)
+        try:
+            self.data_all_ch[ind].append(num)
+            time = [i * 0.5 for i in range(len(self.data_all_ch[ind]))]
+            print(time, self.data_all_ch)
+            if self.interferences < 15:
+                self.interferences += 1
+            else:
+                self.interferences = 0
+                self.graps[ind].plot(time, self.data_all_ch[ind], pen=self.pen)
+        except Exception as err:
+            print("errr", err)
 
     def clear(self):
         self.data_all_ch = [[], [], [], [], []]
