@@ -17,7 +17,6 @@ class GeneralView(QWidget):
         self.interferences = 0
         self.graps = [self.graph1, self.graph2, self.graph3, self.graph4, self.graph5]
         for graph in self.graps:
-            # graph.disableAutoRange()
             graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=parent.maxRightValue)
             graph.setBackground('w')
 
@@ -28,7 +27,6 @@ class GeneralView(QWidget):
         try:
             self.data_all_ch[ind].append(num)
             time = [i * 0.5 for i in range(len(self.data_all_ch[ind]))]
-            print(time, self.data_all_ch)
             if self.interferences < 15:
                 self.interferences += 1
             else:

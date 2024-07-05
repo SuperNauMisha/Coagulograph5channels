@@ -109,9 +109,9 @@ class Channel(QWidget):
 
             t_clotting = round(plato[0, 0] - zeroboard[0], 2) #Время свёртывания, сек
             v_clotting = round((datanorm[1, zeroboard[1]] - plato[0, 1]) / t_clotting * 60, 2) #Скорость свёртывания, ед/сек
-            cof_retr = round((datanorm[1, zeroboard[1]] - deltamin[0]) / datanorm[1, zeroboard[1]] * 100, 2) #Коэффицент ректракции, %
+            cof_retr = round((datanorm[1, zeroboard[1]] - deltamin[0]) / datanorm[1, zeroboard[1]] * 100, 2) #Коэффициент ректракции, %
             v_fibrin = round((plato[2, 1] - plato[1, 1]) / 180 * 60, 2) #Скорость нарастания фибринолиза, ед/сек
-            cof_fibrin = round((plato[2, 1] - deltamin[0]) / plato[2, 1] * 100, 2) #Коэффицент фибринолиза, %
+            cof_fibrin = round((plato[2, 1] - deltamin[0]) / plato[2, 1] * 100, 2) #Коэффициент фибринолиза, %
             act_fibrin = round(plato[2, 1] / (datanorm[1, zeroboard[1]] - deltamin[0]) * 100, 2)
 
             self.graph_data = [zeroboard[0] + self.addTime, deltamin[1] + self.addTime,
@@ -135,8 +135,8 @@ class Channel(QWidget):
             strok_output += "Скорость свёртывания, ед/мин" + " " * (40 - len("Скорость свёртывания, ед/мин")) + str(v_clotting) + "\n"
             strok_output += "Скорость нарастания фибринолиза, ед/мин" + " " * (40 - len("Скорость нарастания фибринолиза, ед/мин")) + str(v_fibrin) + "\n"
 
-            strok_output += "Коэффицент ректракции, %" + " " * (40 - len("Коэффицент ректракции, %")) + str(cof_retr) + "\n"
-            strok_output += "Коэффицент фибринолиза, %" + " " * (40 - len("Коэффицент фибринолиза, %")) + str(cof_fibrin) + "\n"
+            strok_output += "Коэффициент ректракции, %" + " " * (40 - len("Коэффициент ректракции, %")) + str(cof_retr) + "\n"
+            strok_output += "Коэффициент фибринолиза, %" + " " * (40 - len("Коэффициент фибринолиза, %")) + str(cof_fibrin) + "\n"
             strok_output += "Активность фибринолиза, %" + " " * (40 - len("Активность фибринолиза, %")) + str(act_fibrin) + "\n"
 
             self.output.setPlainText(strok_output)

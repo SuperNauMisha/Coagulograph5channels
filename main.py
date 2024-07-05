@@ -113,6 +113,8 @@ class Main(QMainWindow):
             self.serial.setPortName(choose_com_port)
             self.serial.open(QIODevice.ReadWrite)
             self.serial.readyRead.connect(self.onRead)
+            self.sendData('a' + str(self.alpha1.value()))
+            self.sendData('b' + str(self.alpha2.value()))
             self.sendData('r')
         except Exception as err:
             print(err)
@@ -167,9 +169,9 @@ class Main(QMainWindow):
             print("err", err)
 
     def sendData(self, data_to_send):
-            if self.serial.isOpen():
-                data_to_send += "*"
-                self.serial.write(data_to_send.encode())
+        if self.serial.isOpen():
+            data_to_send += "*"
+            self.serial.write(data_to_send.encode())
     def save(self):
         data_patient = [self.dateTimeEdit.dateTime().toString('dd.MM.yyyy hh:mm'), self.addTimeEdit.value(),
                         self.nameEdit.text(), self.numEdit.text(), self.diagnosisEdit.toPlainText(),
