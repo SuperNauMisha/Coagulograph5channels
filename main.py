@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
-from PyQt5.QtCore import QIODevice
+from PyQt5.QtCore import QIODevice, Qt
+from PyQt5.QtGui import QCursor
 from PyQt5 import uic
 import sys
 import datetime
 import openpyxl
 from channel import Channel
 from general_view import GeneralView
+
 
 # Creating the main window
 class Main(QMainWindow):
@@ -19,7 +21,7 @@ class Main(QMainWindow):
         self.width = 700
         self.height = 500
         self.setWindowTitle(self.title)
-        self.maxTopValue = 1200
+        self.maxTopValue = 400
         self.maxRightValue = 2000
         self.chChars = ['@', '#', '$', '%', '^']
 
@@ -54,8 +56,9 @@ class Main(QMainWindow):
         self.serial.readyRead.connect(self.onRead)
         self.graph_data = []
         self.name_data_patient = ["Дата и время", "Доп. время(сек)", "ФИО", "№ Истории болезни",
-                                   "Диагноз", "Препараты", "Обстоятельства", "Фибриноген", "ПТИ", "МНО", "АЧТВ", "ACT", "Д-Димер",
-                                   "Тромбоциты"]
+                                  "Диагноз", "Препараты", "Обстоятельства", "Фибриноген", "ПТИ", "МНО", "АЧТВ", "ACT",
+                                  "Д-Димер",
+                                  "Тромбоциты"]
         self.named_graph_data = ["Время до начала свёртывания, сек",
                                  "Время до окончания свёртывания, сек",
                                  "Длительность свёртывания, сек",
@@ -104,7 +107,6 @@ class Main(QMainWindow):
             self.connectButton.setText("Начать")
             self.onDisconnect()
 
-
     def onConnect(self):
         print("connect")
         try:
@@ -121,8 +123,7 @@ class Main(QMainWindow):
 
     def onDisconnect(self):
         self.sendData('p')
-        #self.serial.close()
-
+        # self.serial.close()
 
     def onClear(self):
         for tab in self.tabsList:
@@ -163,6 +164,8 @@ class Main(QMainWindow):
                     chChar = self.oldstrok_data[0]
                     self.oldstrok_data = ''
                     if chChar in self.chChars:
+                        if int(num) > self.maxTopValue:
+                            num = self.maxTopValue
                         self.tabsList[self.chChars.index(chChar)].writeData(round(int(num) / self.maxTopValue * 100, 2))
                         self.tab6.update_data(self.chChars.index(chChar), round(int(num) / self.maxTopValue * 100, 2))
         except Exception as err:
@@ -172,6 +175,7 @@ class Main(QMainWindow):
         if self.serial.isOpen():
             data_to_send += "*"
             self.serial.write(data_to_send.encode())
+
     def save(self):
         data_patient = [self.dateTimeEdit.dateTime().toString('dd.MM.yyyy hh:mm'), self.addTimeEdit.value(),
                         self.nameEdit.text(), self.numEdit.text(), self.diagnosisEdit.toPlainText(),
@@ -233,8 +237,8 @@ class Main(QMainWindow):
                         break
                     else:
                         tab.chanelTime.append(val)
-                        cell = sheet.cell(row=row, column=column+1)
-                        val = cell.value #/ self.maxTopValue * 100
+                        cell = sheet.cell(row=row, column=column + 1)
+                        val = cell.value  # / self.maxTopValue * 100
                         # print(val)
                         tab.chanelData.append(val)
                 column += 2
@@ -268,6 +272,7 @@ class Main(QMainWindow):
             self.trombEdit.setValue(data_patient[13])
         except Exception as err:
             print(err)
+
     def calculate(self):
         self.tab1.chCalculate(self)
         self.tab2.chCalculate(self)

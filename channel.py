@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
+from PyQt5.QtGui import QCursor
 import pyqtgraph as pg
 import numpy as np
 
@@ -9,12 +10,14 @@ class Channel(QWidget):
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)
         uic.loadUi('channel.ui', self)
+        self.parent = parent
         self.maxTopValue = parent.maxTopValue
+        self.maxRightValue = parent.maxRightValue
         self.setLayout(self.tabsMain)
         self.named_graph_data = parent.named_graph_data
         self.graph.addLegend()
         self.graph.disableAutoRange()
-        self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=parent.maxRightValue)
+        self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=self.maxRightValue)
         self.maxRightValue = parent.maxRightValue
         self.graph.setBackground('w')
         self.pen = pg.mkPen(color=(255, 0, 0))
@@ -24,7 +27,89 @@ class Channel(QWidget):
         self.norm_data_list = []
         self.now_time = 0
         self.interferences = 0
+        self.startClottingButton.clicked.connect(self.startClottingPressed)
+        self.stopClottingButton.clicked.connect(self.stopClottingPressed)
+        self.startRetrButton.clicked.connect(self.startRetrPressed)
+        self.stopRetrButton.clicked.connect(self.stopRetrPressed)
+        self.fibrinButton.clicked.connect(self.fibrinPressed)
+        self.startClotting = -1
+        self.stopClotting = -1
+        self.startRetr = -1
+        self.stopRetr = -1
+        self.fibrin = -1
+        self.chooseStartClotting = False
+        self.chooseStopClotting = False
+        self.chooseStartRetr = False
+        self.chooseStopRetr = False
+        self.chooseFibrin = False
 
+
+    def startClottingPressed(self):
+        self.stopClottingButton.setChecked(False)
+        self.startRetrButton.setChecked(False)
+        self.stopRetrButton.setChecked(False)
+        self.fibrinButton.setChecked(False)
+        if not self.startClottingButton.isChecked(): self.startClotting = -1
+        else: self.chooseStartClotting = True
+
+    def stopClottingPressed(self):
+        self.startClottingButton.setChecked(False)
+        self.startRetrButton.setChecked(False)
+        self.stopRetrButton.setChecked(False)
+        self.fibrinButton.setChecked(False)
+        if not self.stopClottingButton.isChecked(): self.stopClotting = -1
+        else: self.chooseStopClotting = True
+    def startRetrPressed(self):
+        self.startClottingButton.setChecked(False)
+        self.stopClottingButton.setChecked(False)
+        self.stopRetrButton.setChecked(False)
+        self.fibrinButton.setChecked(False)
+        if not self.startRetrButton.isChecked(): self.startRetr = -1
+        else: self.chooseStartRetr = True
+    def stopRetrPressed(self):
+        self.startClottingButton.setChecked(False)
+        self.stopClottingButton.setChecked(False)
+        self.startRetrButton.setChecked(False)
+        self.fibrinButton.setChecked(False)
+        if not self.stopRetrButton.isChecked(): self.stopRetr = -1
+        else: self.chooseStopRetr = True
+    def fibrinPressed(self):
+        self.startClottingButton.setChecked(False)
+        self.stopClottingButton.setChecked(False)
+        self.startRetrButton.setChecked(False)
+        self.stopRetrButton.setChecked(False)
+        if not self.fibrinButton.isChecked(): self.fibrin = -1
+        else: self.chooseFibrin = True
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            panel_w = 30
+            panel_h = 63
+            buttom_panel_h = 20
+            graph_w = self.graph.rect().width() - panel_w
+            graph_h = self.graph.rect().height() - buttom_panel_h
+            dx = QCursor.pos().x() - self.parent.pos().x() - self.parent.tabs.pos().x() - panel_w
+            dy = QCursor.pos().y() - self.parent.pos().y() - self.parent.tabs.pos().y() - panel_h
+            if dx < 0: dx = 0
+            if dy < 0: dy = 0
+            if dx > graph_w: dx = graph_w
+            if dy > graph_h: dy = graph_h
+            x_ratio = dx / graph_w
+            y_ratio = 1 - (dy / graph_h)
+            if self.chooseStartClotting:
+                self.startClotting = int(self.maxRightValue * x_ratio)
+                self.chooseStartClotting = False
+            if self.chooseStopClotting:
+                self.stopClotting = int(self.maxRightValue * x_ratio)
+                self.chooseStopClotting = False
+            if self.chooseStartRetr:
+                self.startRetr = int(self.maxRightValue * x_ratio)
+                self.chooseStartRetr = False
+            if self.chooseStopRetr:
+                self.stopRetr = int(self.maxRightValue * x_ratio)
+                self.chooseStopRetr = False
+            if self.chooseFibrin:
+                self.fibrin = int(self.maxRightValue * x_ratio)
+                self.chooseFibrin = False
 
 
     def chClear(self):
@@ -35,15 +120,11 @@ class Channel(QWidget):
         self.interferences = 0
         self.output.clear()
         self.graph.clear()
-        self.beforeClottingSlider.setValue(0)
-        self.afterClottingSlider.setValue(0)
 
     def chImport(self):
         if max(self.chanelTime) > self.maxRightValue:
             self.maxRightValue = max(self.chanelTime) + 10
             self.graph.setLimits(yMin=-10, yMax=100, xMin=0, xMax=self.maxRightValue)
-            self.beforeClottingSlider.setMaximum(self.maxRightValue)
-            self.afterClottingSlider.setMaximum(self.maxRightValue)
         self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
 
     def writeData(self, data):
@@ -68,8 +149,8 @@ class Channel(QWidget):
             #(datanorm[0, :] - время верхних пиков, сек; datanorm[1, :] - значение верхних пиков; datanorm[2, :] - время нижних пиков, сек; datanorm[3, :] - значение нижних пиков).
             datanorm = datanorm[:, :-1]
             zeroboard = self.zeropoint(datanorm, np.min(data[1, :])) #граница ухода с начального плато (плато нулей) (одномерный массив (NumPy): [0] - координата границы, сек; [1] - индекс этой точки в datanorm).
-            if self.beforeClottingSlider.value():
-                zeroboard[0] = self.beforeClottingSlider.value()
+            if not self.startClotting == -1:
+                zeroboard[0] = self.startClotting
 
             for i in range(len(datanorm[0, :])):
                 if datanorm[0, i] >= zeroboard[0]:
@@ -77,8 +158,8 @@ class Channel(QWidget):
                     break
 
             deltamin = self.mindeltapoint(datanorm, zeroboard[1]) # точка с минимальной шириной графика (одномерный массив (NumPy): [0] - ширина; [1] - координата, сек; [2] - индекс точки в datanorm).
-            if self.afterClottingSlider.value():
-                deltamin[1] = self.afterClottingSlider.value()
+            if not self.stopClotting == -1:
+                deltamin[1] = self.stopClotting
 
             for i in range(len(datanorm[0, :])):
                 if datanorm[0, i] >= deltamin[1]:

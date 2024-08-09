@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>971</width>
-    <height>522</height>
+    <width>2070</width>
+    <height>541</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>901</width>
+     <width>2011</width>
      <height>461</height>
     </rect>
    </property>
@@ -45,92 +45,94 @@
       <widget class="PlotWidget" name="graph" native="true"/>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="spacing">
         <number>3</number>
        </property>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>21</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 0, 255);
-alternate-background-color: rgb(255, 0, 255);
-color: rgb(255, 0, 255);
-selection-color: rgb(255, 0, 255);
-selection-background-color: rgb(255, 0, 255);</string>
+        <widget class="QPushButton" name="startClottingButton">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
          </property>
          <property name="text">
-          <string/>
+          <string>Начало свёртывания</string>
          </property>
          <property name="checkable">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="stopClottingButton">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Конец свёртывания</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="startRetrButton">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Начало ретракции</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <property name="checked">
           <bool>false</bool>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="afterClottingSlider">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="maximum">
-          <number>2000</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>3</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="enabled">
+         <property name="autoDefault">
           <bool>false</bool>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>21</width>
-           <height>16777215</height>
-          </size>
+         <property name="default">
+          <bool>false</bool>
          </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(0, 0, 0);</string>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="stopRetrButton">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
          </property>
          <property name="text">
-          <string/>
+          <string>Конец ретракции</string>
          </property>
          <property name="checkable">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="beforeClottingSlider">
-         <property name="styleSheet">
-          <string notr="true"/>
+        <widget class="QPushButton" name="fibrinButton">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
          </property>
-         <property name="maximum">
-          <number>2000</number>
+         <property name="text">
+          <string>3 минута фибринолиза</string>
          </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
