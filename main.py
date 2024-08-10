@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget, QSizePolicy
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice, Qt
 from PyQt5.QtGui import QCursor
@@ -92,6 +92,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab6, "General view")
 
         self.tabsLayout.addWidget(self.tabs)
+        self.tabs.sizePolicy().setHorizontalPolicy(QSizePolicy.Expanding)
         self.centralWidget = QWidget()
         self.centralWidget.setLayout(self.mainLayout)
 

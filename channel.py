@@ -95,22 +95,27 @@ class Channel(QWidget):
             if dy > graph_h: dy = graph_h
             x_ratio = dx / graph_w
             y_ratio = 1 - (dy / graph_h)
+
             if self.chooseStartClotting:
                 self.startClotting = int(self.maxRightValue * x_ratio)
                 self.chooseStartClotting = False
+                self.startClottingButton.setChecked(False)
             if self.chooseStopClotting:
                 self.stopClotting = int(self.maxRightValue * x_ratio)
                 self.chooseStopClotting = False
+                self.stopClottingButton.setChecked(False)
             if self.chooseStartRetr:
                 self.startRetr = int(self.maxRightValue * x_ratio)
                 self.chooseStartRetr = False
+                self.startRetrButton.setChecked(False)
             if self.chooseStopRetr:
                 self.stopRetr = int(self.maxRightValue * x_ratio)
                 self.chooseStopRetr = False
+                self.stopRetrButton.setChecked(False)
             if self.chooseFibrin:
                 self.fibrin = int(self.maxRightValue * x_ratio)
                 self.chooseFibrin = False
-
+                self.fibrinButton.setChecked(False)
 
     def chClear(self):
         self.chanelData = []
