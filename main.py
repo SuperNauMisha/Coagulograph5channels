@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget, QSizePolicy
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
-from PyQt5.QtCore import QIODevice, Qt
-from PyQt5.QtGui import QCursor
+from PyQt5.QtCore import QIODevice
 from PyQt5 import uic
 import sys
 import datetime
@@ -95,7 +94,6 @@ class Main(QMainWindow):
         self.tabs.sizePolicy().setHorizontalPolicy(QSizePolicy.Expanding)
         self.centralWidget = QWidget()
         self.centralWidget.setLayout(self.mainLayout)
-
         self.setCentralWidget(self.centralWidget)
         self.show()
 

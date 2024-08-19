@@ -156,31 +156,43 @@ class Channel(QWidget):
             zeroboard = self.zeropoint(datanorm, np.min(data[1, :])) #граница ухода с начального плато (плато нулей) (одномерный массив (NumPy): [0] - координата границы, сек; [1] - индекс этой точки в datanorm).
             if not self.startClotting == -1:
                 zeroboard[0] = self.startClotting
-
-            for i in range(len(datanorm[0, :])):
-                if datanorm[0, i] >= zeroboard[0]:
-                    zeroboard[1] = i
-                    break
+                for i in range(len(datanorm[0, :])):
+                    if datanorm[0, i] >= zeroboard[0]:
+                        zeroboard[1] = i
+                        break
 
             deltamin = self.mindeltapoint(datanorm, zeroboard[1]) # точка с минимальной шириной графика (одномерный массив (NumPy): [0] - ширина; [1] - координата, сек; [2] - индекс точки в datanorm).
             if not self.stopClotting == -1:
                 deltamin[1] = self.stopClotting
-
-            for i in range(len(datanorm[0, :])):
-                if datanorm[0, i] >= deltamin[1]:
-                    deltamin[2] = i
-                    deltamin[0] = datanorm[1, i] - datanorm[3, i]
-                    break
+                for i in range(len(datanorm[0, :])):
+                    if datanorm[0, i] >= deltamin[1]:
+                        deltamin[2] = i
+                        deltamin[0] = datanorm[1, i] - datanorm[3, i]
+                        break
 
             plato = self.platopoint(datanorm, zeroboard[1], deltamin, sigma) # границы центрального плато (возле deltamin) plato - двухмерный массив (NumPy):
             #([0/1/2, 0]- координата левой/правой/трёхминутной границы, сек; [0/1/2, 1] - ширина графика в точке левой/правой/трёхминутной границы).
             #трёхминутная граница - точка, отстоящая от правой границы плато на 3 минуты.
+            if not self.startRetr == -1:
+                plato[0, 0] = self.startRetr
+                for i in range(len(datanorm[0, :])):
+                    if datanorm[0, i] >= plato[0, 0]:
+                        plato[0, 1] = datanorm[1, i] - datanorm[3, i]
 
+            if not self.stopRetr == -1:
+                plato[1, 0] = self.stopRetr
+                for i in range(len(datanorm[0, :])):
+                    if datanorm[0, i] >= plato[1, 0]:
+                        plato[1, 1] = datanorm[1, i] - datanorm[3, i]
+
+            if not self.fibrin == -1:
+                plato[2, 0] = self.fibrin
+                for i in range(len(datanorm[0, :])):
+                    if datanorm[0, i] >= plato[2, 0]:
+                        plato[2, 1] = datanorm[1, i] - datanorm[3, i]
             #рисуем график
             # любой из элементоф графика можно отключить, закомментировав его
             # self.graph.plot(data[0,:],data[1,:])
-
-
 
             self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
             self.graph.plot(datanorm[0, :], datanorm[1,:], pen=pg.mkPen(color=(0, 0, 255)))
