@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QTabWidget, QPlainTextEdit, QSizePolicy
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice
 from PyQt5 import uic
@@ -17,8 +17,6 @@ class Main(QMainWindow):
         self.title = "Коагулограф"
         self.left = 500
         self.top = 300
-        self.width = 700
-        self.height = 500
         self.setWindowTitle(self.title)
         self.maxTopValue = 400
         self.maxRightValue = 2000
@@ -80,8 +78,12 @@ class Main(QMainWindow):
         self.tab4 = Channel(self)
         self.tab5 = Channel(self)
         self.tab6 = GeneralView(self)
+        self.tab7 = QPlainTextEdit()
         self.tabsList = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
 
+        font = self.tab1.output.font()
+        font.setPointSize(14)
+        self.tab7.setFont(font)
         # Add tabs
         self.tabs.addTab(self.tab1, "Channel 1")
         self.tabs.addTab(self.tab2, "Channel 2")
@@ -89,6 +91,7 @@ class Main(QMainWindow):
         self.tabs.addTab(self.tab4, "Channel 4")
         self.tabs.addTab(self.tab5, "Channel 5")
         self.tabs.addTab(self.tab6, "General view")
+        self.tabs.addTab(self.tab7, "General info")
 
         self.tabsLayout.addWidget(self.tabs)
         self.tabs.sizePolicy().setHorizontalPolicy(QSizePolicy.Expanding)
