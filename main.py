@@ -83,7 +83,6 @@ class Main(QMainWindow):
         font = self.tab1.output.font()
         font.setPointSize(14)
         self.tab7.setFont(font)
-        self.tab7.setEditable(False)
         # Add tabs
         self.tabs.addTab(self.tab1, "Channel 1")
         self.tabs.addTab(self.tab2, "Channel 2")
