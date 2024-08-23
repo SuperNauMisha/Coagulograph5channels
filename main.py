@@ -40,7 +40,6 @@ class Main(QMainWindow):
         self.serial.setBaudRate(9600)
         self.isConnected = False
         self.wasStopped = True
-
         self.ports_name_list = []
         self.ports_num_list = []
         ports = QSerialPortInfo().availablePorts()
@@ -84,6 +83,7 @@ class Main(QMainWindow):
         font = self.tab1.output.font()
         font.setPointSize(14)
         self.tab7.setFont(font)
+        self.tab7.setEditable(False)
         # Add tabs
         self.tabs.addTab(self.tab1, "Channel 1")
         self.tabs.addTab(self.tab2, "Channel 2")
@@ -108,6 +108,35 @@ class Main(QMainWindow):
             self.wasStopped = True
             self.connectButton.setText("Начать")
             self.onDisconnect()
+
+    def updateGlobalInfo(self):
+        params_avg = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for tab in self.tabsList:
+            if self.tab6.check_boxes[self.tabsList.index(tab)]:
+                for par_i in range(len(tab.tab_param)):
+                    params_avg[par_i] += tab.tab_param[par_i]
+        for i in range(len(params_avg)):
+            params_avg[i] = round(params_avg[i] / sum(self.tab6.check_boxes), 2)
+        text = ""
+        text = "Время до начала свёртывания, сек" + " " * (40 - len("Время до начала свёртывания, сек")) + str(params_avg[0]) + " " * (10 - len(str(params_avg[0]))) + self.tab1.secToMin(params_avg[0]) + "\n"
+        text += "Время до окончания свёртывания, сек" + " " * (40 - len("Время до окончания свёртывания, сек")) + str(params_avg[1]) + " " * (10 - len(str(params_avg[1]))) + self.tab1.secToMin(params_avg[1]) + "\n"
+        text += "Длительность свёртывания, сек" + " " * (40 - len("Длительность свёртывания, сек")) + str(params_avg[2]) + " " * (10 - len(str(params_avg[2]))) + self.tab1.secToMin(params_avg[2]) + "\n"
+        text += "Время до начала ретракции, сек" + " " * (40 - len("Время до начала ретракции, сек")) + str(params_avg[3]) + " " * (10 - len(str(params_avg[3]))) + self.tab1.secToMin(params_avg[3]) + "\n"
+        text += "Время до окончания ретракции, сек" + " " * (40 - len("Время до окончания ретракции, сек")) + str(params_avg[4]) + " " * (10 - len(str(params_avg[4]))) + self.tab1.secToMin(params_avg[4]) + "\n"
+        text += "Длительность ретракции, сек" + " " * (40 - len("Длительность ретракции, сек")) + str(params_avg[5]) + " " * (10 - len(str(params_avg[5]))) + self.tab1.secToMin(params_avg[5]) + "\n"
+
+        text += "Максимальная амплитуда, ед" + " " * (40 - len("Максимальная амплитуда, ед")) + str(params_avg[6]) + "\n"
+        text += "Минимальная амплитуда, ед" + " " * (40 - len("Минимальная амплитуда, ед")) + str(params_avg[7]) + "\n"
+        text += "Амплитуда на 3 минуте фибринолиза, ед" + " " * (40 - len("Амплитуда на 3 минуте фибринолиза, ед")) + str(params_avg[8]) + "\n"
+
+        text += "Скорость свёртывания, ед/мин" + " " * (40 - len("Скорость свёртывания, ед/мин")) + str(params_avg[9]) + "\n"
+        text += "Скорость нарастания фибринолиза, ед/мин" + " " * (40 - len("Скорость нарастания фибринолиза, ед/мин")) + str(params_avg[10]) + "\n"
+
+        text += "Коэффициент ректракции, %" + " " * (40 - len("Коэффициент ректракции, %")) + str(params_avg[11]) + "\n"
+        text += "Коэффициент фибринолиза, %" + " " * (40 - len("Коэффициент фибринолиза, %")) + str(params_avg[12]) + "\n"
+        text += "Активность фибринолиза, %" + " " * (40 - len("Активность фибринолиза, %")) + str(params_avg[13]) + "\n"
+        self.tab7.setPlainText(text)
+
 
     def onConnect(self):
         print("connect")
@@ -245,6 +274,7 @@ class Main(QMainWindow):
                         tab.chanelData.append(val)
                 column += 2
                 tab.chImport()
+                self.tab6.generalImport(self.tabsList.index(tab), tab.chanelTime, tab.chanelData)
         except Exception as err:
             print(err)
         # norm_data_list = [int(item / self.maxTopValue * 100) for item in self.data_list]
@@ -281,6 +311,7 @@ class Main(QMainWindow):
         self.tab3.chCalculate(self)
         self.tab4.chCalculate(self)
         self.tab5.chCalculate(self)
+        self.updateGlobalInfo()
 
 
 if __name__ == '__main__':

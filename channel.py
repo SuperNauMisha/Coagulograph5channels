@@ -24,6 +24,7 @@ class Channel(QWidget):
         self.calculateButon.clicked.connect(parent.calculate)
         self.chanelData = []
         self.chanelTime = []
+        self.tab_param = []
         self.norm_data_list = []
         self.now_time = 0
         self.interferences = 0
@@ -236,6 +237,25 @@ class Channel(QWidget):
             strok_output += "Коэффициент ректракции, %" + " " * (40 - len("Коэффициент ректракции, %")) + str(cof_retr) + "\n"
             strok_output += "Коэффициент фибринолиза, %" + " " * (40 - len("Коэффициент фибринолиза, %")) + str(cof_fibrin) + "\n"
             strok_output += "Активность фибринолиза, %" + " " * (40 - len("Активность фибринолиза, %")) + str(act_fibrin) + "\n"
+            self.tab_param = []
+            self.tab_param.append(zeroboard[0] + self.addTime)
+            self.tab_param.append(deltamin[1] + self.addTime)
+            self.tab_param.append(t_clotting)
+            self.tab_param.append(plato[0, 0] + self.addTime)
+            self.tab_param.append(plato[1, 0] + self.addTime)
+            self.tab_param.append(plato[1, 0] - plato[0, 0])
+
+            self.tab_param.append(datanorm[1, zeroboard[1]])
+            self.tab_param.append(deltamin[0])
+            self.tab_param.append(plato[2, 1])
+
+            self.tab_param.append(v_clotting)
+            self.tab_param.append(v_fibrin)
+
+            self.tab_param.append(cof_retr)
+            self.tab_param.append(cof_fibrin)
+            self.tab_param.append(act_fibrin)
+
 
             self.output.setPlainText(strok_output)
         except Exception as err:
