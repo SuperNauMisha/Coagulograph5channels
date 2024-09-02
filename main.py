@@ -51,6 +51,7 @@ class Main(QMainWindow):
         self.ports.addItems(self.ports_name_list)
         self.serial.readyRead.connect(self.onRead)
         self.graph_data = []
+        self.par_avg = []
         self.name_data_patient = ["Дата и время", "Доп. время(сек)", "ФИО", "№ Истории болезни",
                                   "Диагноз", "Препараты", "Обстоятельства", "Фибриноген", "ПТИ", "МНО", "АЧТВ", "ACT",
                                   "Д-Димер",
@@ -134,6 +135,7 @@ class Main(QMainWindow):
         text += "Коэффициент ректракции, %" + " " * (40 - len("Коэффициент ректракции, %")) + str(params_avg[11]) + "\n"
         text += "Коэффициент фибринолиза, %" + " " * (40 - len("Коэффициент фибринолиза, %")) + str(params_avg[12]) + "\n"
         text += "Активность фибринолиза, %" + " " * (40 - len("Активность фибринолиза, %")) + str(params_avg[13]) + "\n"
+        self.par_avg = params_avg
         self.tab7.setPlainText(text)
 
 
@@ -236,6 +238,48 @@ class Main(QMainWindow):
         for row in range(len(all_data)):
             cell = sheet.cell(row=row + 1, column=12)
             cell.value = all_data[row]
+
+        for row in range(len(self.named_graph_data)):
+            cell = sheet.cell(row=row + 2, column=13)
+            cell.value = self.named_graph_data[row]
+
+        cell = sheet.cell(row=1, column=14)
+        cell.value = "Channel 1"
+        cell = sheet.cell(row=1, column=15)
+        cell.value = "Channel 2"
+        cell = sheet.cell(row=1, column=16)
+        cell.value = "Channel 3"
+        cell = sheet.cell(row=1, column=17)
+        cell.value = "Channel 4"
+        cell = sheet.cell(row=1, column=18)
+        cell.value = "Channel 5"
+        cell = sheet.cell(row=1, column=19)
+        cell.value = "Average"
+
+        for row in range(len(self.tabsList[0].tab_param)):
+            cell = sheet.cell(row=row + 2, column=14)
+            cell.value = self.tabsList[0].tab_param[row]
+
+        for row in range(len(self.tabsList[1].tab_param)):
+            cell = sheet.cell(row=row + 2, column=15)
+            cell.value = self.tabsList[1].tab_param[row]
+
+        for row in range(len(self.tabsList[2].tab_param)):
+            cell = sheet.cell(row=row + 2, column=16)
+            cell.value = self.tabsList[2].tab_param[row]
+
+        for row in range(len(self.tabsList[3].tab_param)):
+            cell = sheet.cell(row=row + 2, column=17)
+            cell.value = self.tabsList[3].tab_param[row]
+
+        for row in range(len(self.tabsList[4].tab_param)):
+            cell = sheet.cell(row=row + 2, column=18)
+            cell.value = self.tabsList[4].tab_param[row]
+
+        for row in range(len(self.par_avg)):
+            cell = sheet.cell(row=row + 2, column=19)
+            cell.value = self.par_avg[row]
+
         try:
             filename = QFileDialog.getSaveFileName(self, "Сохранить в таблицу",
                                                    str(self.nameEdit.text().split()[0]) + '_' +
