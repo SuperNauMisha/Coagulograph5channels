@@ -3,7 +3,9 @@ from PyQt5.QtCore import Qt
 from PyQt5 import uic
 from PyQt5.QtGui import QCursor
 import pyqtgraph as pg
+from scipy.fft import fft, fftfreq
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Channel(QWidget):
@@ -147,13 +149,24 @@ class Channel(QWidget):
         try:
             self.graph.clear()
             sigma = 0.25 #допуск для "плато" в долях
-            period = 20
             data = np.array([np.array(self.chanelTime), np.array(self.chanelData)])
+
+            #Преобразование Фурье для вычисления периода колебаний
+            furt = fft(data[1, :])
+            xf = fftfreq(len(data[1, :]), 0.5)[:len(data[1, :]) // 2]
+            xfs = xf[2:]
+            furts = 2.0 / len(data[1, :][2:]) * np.abs(furt[2:len(data[1, :][2:]) // 2])
+            print(1 / xfs[furts.argmax()])
+
+
+            period = round(2 / xfs[furts.argmax()]) #20
+
             self.addTime = parent.addTimeEdit.value()
             # (data[0, :] - координата времени, сек; data[1, :] - значение прибора(?), соответсвующий данному моменту времени).
             datanorm = self.contour(data, period) #перестраиваем на верхние и нижние пики. datanorm - четырёхмерный массив (NumPy):
             #(datanorm[0, :] - время верхних пиков, сек; datanorm[1, :] - значение верхних пиков; datanorm[2, :] - время нижних пиков, сек; datanorm[3, :] - значение нижних пиков).
             datanorm = datanorm[:, :-1]
+
             zeroboard = self.zeropoint(datanorm, np.min(data[1, :])) #граница ухода с начального плато (плато нулей) (одномерный массив (NumPy): [0] - координата границы, сек; [1] - индекс этой точки в datanorm).
             if not self.startClotting == -1:
                 zeroboard[0] = self.startClotting
@@ -193,7 +206,13 @@ class Channel(QWidget):
                         plato[2, 1] = datanorm[1, i] - datanorm[3, i]
             #рисуем график
             # любой из элементоф графика можно отключить, закомментировав его
-            # self.graph.plot(data[0,:],data[1,:])
+            # print(2.0/len(data[1, :]) * np.abs(furt[0:len(data[1, :])//2]))
+            # print(xf)
+            # print()
+            # plt.plot(xf, 2.0/len(data[1, :]) * np.abs(furt[:len(data[1, :])//2]))
+            # plt.grid()
+            # plt.show()
+            # self.graph.plot(xf, 2.0/len(data[1, :]) * np.abs(furt[0:len(data[1, :])//2]), pen=pg.mkPen(color=(0, 255, 0)))
 
             self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
             self.graph.plot(datanorm[0, :], datanorm[1,:], pen=pg.mkPen(color=(0, 0, 255)))
@@ -202,16 +221,16 @@ class Channel(QWidget):
             self.graph.plot([deltamin[1], deltamin[1]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Время до окончания свёртывания, t = {deltamin[1]} сек', pen=pg.mkPen(color=(255, 0, 255), width=2))
             self.graph.plot([plato[0, 0], plato[0, 0]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Время до начала ретракции, t = {plato[0, 0]} сек', pen=pg.mkPen(color=(255, 100, 166), width=2, style=Qt.DashLine))
             self.graph.plot([plato[1, 0], plato[1, 0]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Время окончания ретракции, t = {plato[1, 0]} сек', pen=pg.mkPen(color=(255, 165, 0), width=2, style=Qt.DashLine))
-            self.graph.plot([plato[2, 0], plato[2, 0]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Амплитуда на 3 минуте фибринолиза = {plato[2, 1]}', pen=pg.mkPen(color=(0, 100, 100), width=2, style=Qt.DashDotDotLine))
+            self.graph.plot([plato[2, 0], plato[2, 0]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Амплитуда на 3 минуте фибринолиза = {round(plato[2, 1], 2)}', pen=pg.mkPen(color=(0, 100, 100), width=2, style=Qt.DashDotDotLine))
             self.graph.showGrid(x=True, y=True)
 
 
-            t_clotting = round(plato[0, 0] - zeroboard[0], 2) #Время свёртывания, сек
-            v_clotting = round((datanorm[1, zeroboard[1]] - plato[0, 1]) / t_clotting * 60, 2) #Скорость свёртывания, ед/сек
-            cof_retr = round((datanorm[1, zeroboard[1]] - deltamin[0]) / datanorm[1, zeroboard[1]] * 100, 2) #Коэффициент ректракции, %
-            v_fibrin = round((plato[2, 1] - plato[1, 1]) / 180 * 60, 2) #Скорость нарастания фибринолиза, ед/сек
+            t_clotting = round(deltamin[1] - zeroboard[0], 2) #Время свёртывания, сек
+            v_clotting = round((datanorm[1, zeroboard[1]] - datanorm[3, zeroboard[1]] - deltamin[0]) / t_clotting * 60, 2) #Скорость свёртывания, ед/мин
+            cof_retr = round((datanorm[1, zeroboard[1]] - datanorm[3, zeroboard[1]] - deltamin[0]) / datanorm[1, zeroboard[1]] - datanorm[3, zeroboard[1]] * 100, 2) #Коэффициент ректракции, %
+            v_fibrin = round((plato[2, 1] - plato[1, 1]) / 180 * 60, 2) #Скорость нарастания фибринолиза, ед/мин
             cof_fibrin = round((plato[2, 1] - deltamin[0]) / plato[2, 1] * 100, 2) #Коэффициент фибринолиза, %
-            act_fibrin = round(plato[2, 1] / (datanorm[1, zeroboard[1]] - deltamin[0]) * 100, 2)
+            act_fibrin = round(plato[2, 1] / (datanorm[1, zeroboard[1]] - datanorm[3, zeroboard[1]] - deltamin[0]) * 100, 2)
 
             self.graph_data = [zeroboard[0] + self.addTime, deltamin[1] + self.addTime,
                                t_clotting, plato[0, 0] + self.addTime, plato[1, 0],
@@ -227,14 +246,14 @@ class Channel(QWidget):
             strok_output += "Время до окончания ретракции, сек" + " " * (40 - len("Время до окончания ретракции, сек")) + str(plato[1, 0] + self.addTime) + " " * (10 - len(str(plato[1, 0] + self.addTime))) + self.secToMin(plato[1, 0] + self.addTime) + "\n"
             strok_output += "Длительность ретракции, сек" + " " * (40 - len("Длительность ретракции, сек")) + str(plato[1, 0] - plato[0, 0]) + " " * (10 - len(str(plato[1, 0] - plato[0, 0]))) + self.secToMin(plato[1, 0] - plato[0, 0]) + "\n"
 
-            strok_output += "Максимальная амплитуда, ед" + " " * (40 - len("Максимальная амплитуда, ед")) + str(datanorm[1, zeroboard[1]]) + "\n"
+            strok_output += "Максимальная амплитуда, ед" + " " * (40 - len("Максимальная амплитуда, ед")) + str(datanorm[1, zeroboard[1]] - datanorm[3, zeroboard[1]]) + "\n"
             strok_output += "Минимальная амплитуда, ед" + " " * (40 - len("Минимальная амплитуда, ед")) + str(deltamin[0]) + "\n"
             strok_output += "Амплитуда на 3 минуте фибринолиза, ед" + " " * (40 - len("Амплитуда на 3 минуте фибринолиза, ед")) + str(plato[2, 1]) + "\n"
 
             strok_output += "Скорость свёртывания, ед/мин" + " " * (40 - len("Скорость свёртывания, ед/мин")) + str(v_clotting) + "\n"
             strok_output += "Скорость нарастания фибринолиза, ед/мин" + " " * (40 - len("Скорость нарастания фибринолиза, ед/мин")) + str(v_fibrin) + "\n"
 
-            strok_output += "Коэффициент ректракции, %" + " " * (40 - len("Коэффициент ректракции, %")) + str(cof_retr) + "\n"
+            strok_output += "Коэффициент ретракции, %" + " " * (40 - len("Коэффициент ретракции, %")) + str(cof_retr) + "\n"
             strok_output += "Коэффициент фибринолиза, %" + " " * (40 - len("Коэффициент фибринолиза, %")) + str(cof_fibrin) + "\n"
             strok_output += "Активность фибринолиза, %" + " " * (40 - len("Активность фибринолиза, %")) + str(act_fibrin) + "\n"
             self.tab_param = []

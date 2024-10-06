@@ -1,8 +1,6 @@
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import Qt
 from PyQt5 import uic
 import pyqtgraph as pg
-import numpy as np
 
 
 class GeneralView(QWidget):
