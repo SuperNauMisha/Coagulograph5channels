@@ -1,3 +1,4 @@
+from PIL.ImageOps import mirror
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -174,7 +175,7 @@ class Channel(QWidget):
                     if datanorm[0, i] >= zeroboard[0]:
                         zeroboard[1] = i
                         break
-
+            mirror_r = self.mirror([zeroboard[1], datanorm[1, zeroboard[1]]], datanorm)
             deltamin = self.mindeltapoint(datanorm, zeroboard[1]) # точка с минимальной шириной графика (одномерный массив (NumPy): [0] - ширина; [1] - координата, сек; [2] - индекс точки в datanorm).
             if not self.stopClotting == -1:
                 deltamin[1] = self.stopClotting
@@ -187,6 +188,7 @@ class Channel(QWidget):
             plato = self.platopoint(datanorm, zeroboard[1], deltamin, sigma) # границы центрального плато (возле deltamin) plato - двухмерный массив (NumPy):
             #([0/1/2, 0]- координата левой/правой/трёхминутной границы, сек; [0/1/2, 1] - ширина графика в точке левой/правой/трёхминутной границы).
             #трёхминутная граница - точка, отстоящая от правой границы плато на 3 минуты.
+
             if not self.startRetr == -1:
                 plato[0, 0] = self.startRetr
                 for i in range(len(datanorm[0, :])):
@@ -215,6 +217,7 @@ class Channel(QWidget):
             # self.graph.plot(xf, 2.0/len(data[1, :]) * np.abs(furt[0:len(data[1, :])//2]), pen=pg.mkPen(color=(0, 255, 0)))
 
             self.graph.plot(self.chanelTime, self.chanelData, pen=self.pen)
+            self.graph.plot(mirror_r[0, :], mirror_r[1, :], pen=pg.mkPen(color=(0, 0, 255)))
             self.graph.plot(datanorm[0, :], datanorm[1,:], pen=pg.mkPen(color=(0, 0, 255)))
             self.graph.plot(datanorm[2, :], datanorm[3, :], name="Границы", pen=pg.mkPen(color=(0, 0, 255)))
             self.graph.plot([zeroboard[0], zeroboard[0]], [np.min(data[1, :])-10, np.max(data[1, :])+10], name=f'Время до начала свёртывания, t = {zeroboard[0]} сек', pen=pg.mkPen(color=(0, 0, 0), width=2))
@@ -303,6 +306,11 @@ class Channel(QWidget):
             countnorm = countnorm+1
         return datanorm
 
+    def mirror(self, init_point, datanorm): #init_point[0] координата в datanorm, init_point[1] - значение точки начала свёртывания
+        mirror_res = np.array([datanorm[0, init_point[0]:], datanorm[1, init_point[0]:]])
+        for i in range(len(mirror_res[1, :])):
+            mirror_res[1, i] = 2 * init_point[1] - mirror_res[1, i]
+        return mirror_res
 
     def zeropoint(self, datanorm, min_of_data): #min_of_data = np.min(data[1, :])
         zeroboard = np.array([0, 0])
